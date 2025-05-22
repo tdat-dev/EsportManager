@@ -28,7 +28,7 @@ namespace EsportManager
                 // Đặt màu nền
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Clear();
+                EsportManager.Utils.UIHelper.SafeClear();
 
                 // Thiết lập kích thước console lớn hơn
                 try
@@ -39,7 +39,10 @@ namespace EsportManager
                 catch (Exception)
                 {
                     // Nếu không thể đặt kích thước mong muốn, kiểm tra kích thước tối thiểu
-                    if (Console.WindowWidth < MIN_CONSOLE_WIDTH || Console.WindowHeight < MIN_CONSOLE_HEIGHT)
+                    int currentWidth = EsportManager.Utils.UIHelper.SafeGetWindowWidth();
+                    int currentHeight = EsportManager.Utils.UIHelper.SafeGetWindowHeight();
+
+                    if (currentWidth < MIN_CONSOLE_WIDTH || currentHeight < MIN_CONSOLE_HEIGHT)
                     {
                         Console.WriteLine($"Kích thước cửa sổ quá nhỏ. Vui lòng mở rộng cửa sổ console (tối thiểu {MIN_CONSOLE_WIDTH}x{MIN_CONSOLE_HEIGHT}).");
                         Console.WriteLine("Nhấn phím bất kỳ để tiếp tục với kích thước hiện tại hoặc mở rộng cửa sổ trước...");
@@ -51,7 +54,7 @@ namespace EsportManager
                         Console.WriteLine("Nhấn phím bất kỳ để tiếp tục...");
                         Console.ReadKey(true);
                     }
-                    Console.Clear();
+                    EsportManager.Utils.UIHelper.SafeClear();
                 }
 
                 // Hiển thị màn hình khởi động với font đặc biệt
@@ -64,7 +67,7 @@ namespace EsportManager
                 try
                 {
                     // Hiển thị thông báo khởi tạo
-                    Console.Clear();
+                    EsportManager.Utils.UIHelper.SafeClear();
                     Console.WriteLine("Đang khởi tạo hệ thống...");
                     System.Threading.Thread.Sleep(500);
 
@@ -76,7 +79,7 @@ namespace EsportManager
                 }
                 catch (Exception ex)
                 {
-                    Console.Clear();
+                    EsportManager.Utils.UIHelper.SafeClear();
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Lỗi kết nối cơ sở dữ liệu: " + ex.Message);
                     Console.WriteLine("\nĐang chuyển sang chế độ Demo (dữ liệu mẫu)...");
@@ -88,7 +91,7 @@ namespace EsportManager
                 }
 
                 // Hiển thị thông báo kết nối cơ sở dữ liệu
-                Console.Clear();
+                EsportManager.Utils.UIHelper.SafeClear();
                 Console.WriteLine("Đang kết nối cơ sở dữ liệu...");
                 System.Threading.Thread.Sleep(500);
 
@@ -96,7 +99,7 @@ namespace EsportManager
                 userService = new UserService(userRepository);
 
                 // Hiển thị thông báo khởi tạo dịch vụ
-                Console.Clear();
+                EsportManager.Utils.UIHelper.SafeClear();
                 Console.WriteLine("Đang khởi tạo dịch vụ người dùng...");
                 System.Threading.Thread.Sleep(500);
 
@@ -104,7 +107,7 @@ namespace EsportManager
                 IScreen mainScreen = new MainMenuScreen(userService);
 
                 // Hiển thị thông báo chuẩn bị giao diện
-                Console.Clear();
+                EsportManager.Utils.UIHelper.SafeClear();
                 Console.WriteLine("Chuẩn bị hiển thị giao diện...");
                 System.Threading.Thread.Sleep(500);
 
@@ -113,7 +116,7 @@ namespace EsportManager
             }
             catch (Exception ex)
             {
-                Console.Clear();
+                EsportManager.Utils.UIHelper.SafeClear();
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Đã xảy ra lỗi không thể khắc phục: " + ex.Message);
                 Console.WriteLine("Chi tiết lỗi: " + ex.StackTrace);
@@ -132,12 +135,12 @@ namespace EsportManager
         private static void ShowSpecialStartupScreen()
         {
             Console.CursorVisible = false;
-            Console.Clear();
+            EsportManager.Utils.UIHelper.SafeClear();
 
             try
             {
-                int windowWidth = Console.WindowWidth;
-                int windowHeight = Console.WindowHeight;
+                int windowWidth = EsportManager.Utils.UIHelper.SafeGetWindowWidth();
+                int windowHeight = EsportManager.Utils.UIHelper.SafeGetWindowHeight();
                 int startY = windowHeight / 3;
 
                 // Đảm bảo kích thước khung viền phù hợp với kích thước cửa sổ
@@ -194,13 +197,13 @@ namespace EsportManager
 
                 Console.ForegroundColor = ConsoleColor.White;
                 System.Threading.Thread.Sleep(700);
-                Console.Clear();
+                EsportManager.Utils.UIHelper.SafeClear();
             }
             catch
             {
                 // Nếu có lỗi, không làm gì cả
                 System.Threading.Thread.Sleep(1000);
-                Console.Clear();
+                EsportManager.Utils.UIHelper.SafeClear();
             }
         }
 
@@ -210,8 +213,11 @@ namespace EsportManager
             try
             {
                 // Đảm bảo vị trí nằm trong giới hạn cửa sổ console
-                int safeLeft = Math.Max(0, Math.Min(left, Console.WindowWidth - 1));
-                int safeTop = Math.Max(0, Math.Min(top, Console.WindowHeight - 1));
+                int windowWidth = EsportManager.Utils.UIHelper.SafeGetWindowWidth();
+                int windowHeight = EsportManager.Utils.UIHelper.SafeGetWindowHeight();
+
+                int safeLeft = Math.Max(0, Math.Min(left, windowWidth - 1));
+                int safeTop = Math.Max(0, Math.Min(top, windowHeight - 1));
 
                 Console.SetCursorPosition(safeLeft, safeTop);
             }

@@ -57,12 +57,10 @@ namespace EsportManager.UI.Screens
                             nextScreen = new AdminMenuScreen(_userService);
                             break;
                         case "Player":
-                            // TODO: Tạo và hiển thị PlayerScreen
-                            ShowInfoMessage("Chức năng Player đang được phát triển...");
+                            nextScreen = new PlayerMenuScreen(_userService);
                             break;
                         case "Viewer":
-                            // TODO: Tạo và hiển thị ViewerScreen
-                            ShowInfoMessage("Chức năng Viewer đang được phát triển...");
+                            nextScreen = new ViewerMenuScreen(_userService);
                             break;
                     }
 
@@ -77,11 +75,31 @@ namespace EsportManager.UI.Screens
                 }
                 else
                 {
-                    // Hiển thị thông báo đăng nhập thất bại
-                    ShowErrorMessage("Đăng nhập thất bại! Tên đăng nhập hoặc mật khẩu không đúng.");
+                    // Kiểm tra trực tiếp và hiển thị thông báo debug
+                    string debugInfo = "";
 
-                    // Hiển thị lại màn hình đăng nhập
-                    Show();
+                    var repo = new Program.MockUserRepository();
+                    var testUser = repo.GetByUsername(username);
+
+                    if (testUser == null)
+                    {
+                        debugInfo = $"Không tìm thấy tài khoản với tên đăng nhập '{username}'";
+                    }
+                    else if (testUser.Status != "Approved")
+                    {
+                        debugInfo = $"Tài khoản '{username}' có trạng thái '{testUser.Status}', không phải 'Approved'";
+                    }
+                    else
+                    {
+                        debugInfo = "Không xác định được lỗi cụ thể. Vui lòng liên hệ admin.";
+                    }
+
+                    // Hiển thị thông báo đăng nhập thất bại với thông tin debug
+                    ShowErrorMessage($"Đăng nhập thất bại! Tên đăng nhập hoặc mật khẩu không đúng.\n\nChi tiết lỗi: {debugInfo}");
+
+                    // Quay lại màn hình chính thay vì hiển thị lại màn hình đăng nhập
+                    IScreen mainScreen = new MainMenuScreen(_userService);
+                    mainScreen.Show();
                 }
             }
             catch (Exception ex)
@@ -154,8 +172,6 @@ namespace EsportManager.UI.Screens
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-
-
         // Phương thức đọc mật khẩu, hiển thị dưới dạng dấu *
         private string ReadPassword()
         {
@@ -209,7 +225,14 @@ namespace EsportManager.UI.Screens
             Console.WriteLine("\n\n");
             Console.WriteLine(CenterText("=== THÔNG BÁO ==="));
             Console.WriteLine();
-            Console.WriteLine(CenterText(message));
+
+            // Xử lý thông báo nhiều dòng
+            string[] lines = message.Split('\n');
+            foreach (string line in lines)
+            {
+                Console.WriteLine(CenterText(line));
+            }
+
             Console.WriteLine();
 
             Console.ForegroundColor = ConsoleColor.White;
